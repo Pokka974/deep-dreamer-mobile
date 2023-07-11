@@ -5,14 +5,20 @@ interface IButton {
     title: string;
     onPress: () => void;
     style: 'primary' | 'secondary';
+    disabled: boolean;
 }
 
-const Button = ({ title, onPress, style }: IButton) => {
-    const customColor = style === 'primary' ? 'bg-primary' : 'bg-secondary';
+const Button = ({ title, onPress, style, disabled }: IButton) => {
+    const customColor = disabled
+        ? 'bg-secondary opacity-50'
+        : style === 'primary'
+        ? 'bg-primary'
+        : 'bg-secondary';
 
     return (
         <TouchableOpacity
-            className={`${customColor} rounded-3xl py-3 px-12 items-center justify-center`}
+            disabled={disabled}
+            className={`${customColor} rounded-3xl py-3 px-12 items-center justify-center disabled:`}
             onPress={onPress}
         >
             <Text className="text-white font-{custom} font-bold text-base">
