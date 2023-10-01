@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { ScrollView, Text, Image } from 'react-native';
+import { ScrollView, Text, View, Image } from 'react-native';
 import Button from '../../components/Button/Button';
 import InputField from '../../components/InputField/InputField';
 
@@ -30,33 +30,43 @@ const Login = ({ navigation }: any) => {
                 gap: 1,
             }}
         >
-            <Text className="pb-8 text-lg">Welcome to Deep Dreamer</Text>
-            <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <InputField
-                        placeholder="Email"
-                        onChangeText={onChange}
-                        value={value}
-                        onBlur={onBlur}
-                    />
-                )}
-                name="email"
-                rules={{ required: 'Email is required.' }}
-            />
-            <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <InputField
-                        placeholder="Password"
-                        onChangeText={onChange}
-                        value={value}
-                        onBlur={onBlur}
-                    />
-                )}
-                name="password"
-                rules={{ required: 'Password is required.' }}
-            />
+            <Image
+                source={require('../../assets/deep-catcher-logo.png')}
+                style={{ width: 200, height: 300 }}
+            ></Image>
+            <Text className="pb-8 text-3xl font-bold">Deep Dreamer</Text>
+            <View className="w-full mb-4">
+                <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <InputField
+                            placeholder="Email"
+                            onChangeText={onChange}
+                            value={value}
+                            onBlur={onBlur}
+                            error={errors.email && 'email is required'}
+                        />
+                    )}
+                    name="email"
+                    rules={{ required: 'Email is required.' }}
+                />
+            </View>
+            <View className="w-full mb-4">
+                <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <InputField
+                            placeholder="Password"
+                            onChangeText={onChange}
+                            value={value}
+                            onBlur={onBlur}
+                            error={errors.password && 'password is required'}
+                        />
+                    )}
+                    name="password"
+                    rules={{ required: 'Password is required.' }}
+                />
+            </View>
             <Button
                 title="Login"
                 onPress={handleSubmit(onSubmit)}
