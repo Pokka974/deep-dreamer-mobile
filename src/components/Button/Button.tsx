@@ -18,7 +18,7 @@ const Button = ({ title, onPress, style, disabled = false }: IButton) => {
     return (
         <TouchableOpacity
             disabled={disabled}
-            className={`${customColor} rounded-3xl py-3 px-12 items-center justify-center disabled:`}
+            className={`${customColor} h-14 w-full rounded-3xl py-3 items-center justify-center disabled:`}
             onPress={onPress}
         >
             <Text className="text-white font-{custom} font-bold text-base">

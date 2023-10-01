@@ -1,12 +1,11 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-// import { Link } from 'react-router-dom';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, Image } from 'react-native';
 import Button from '../../components/Button/Button';
 import InputField from '../../components/InputField/InputField';
 
 //TODO: type navigation
-const Login = ({ navigation }) => {
+const Login = ({ navigation }: any) => {
     const {
         control,
         handleSubmit,
@@ -22,13 +21,16 @@ const Login = ({ navigation }) => {
 
     return (
         <ScrollView
+            className="p-4 bg-light"
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{
                 flexGrow: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
+                gap: 1,
             }}
         >
-            <Text>Welcome to Deep Dreamer</Text>
+            <Text className="pb-8 text-lg">Welcome to Deep Dreamer</Text>
             <Controller
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -61,11 +63,15 @@ const Login = ({ navigation }) => {
                 style="primary"
                 disabled={false}
             />
-            <Button
-                style="secondary"
-                title="Sign Up"
+            <Text className="pt-2 underline" onPress={() => {}}>
+                Forgot password?
+            </Text>
+            <Text
+                className="pt-2 text-base  font-semibold"
                 onPress={() => navigation.navigate('Register')}
-            />
+            >
+                Sign Up
+            </Text>
         </ScrollView>
     );
 };
