@@ -23,15 +23,15 @@ const InputField: React.FC<InputFieldProps> = ({
     numberOfLines = 1,
 }) => {
     return (
-        <View className={'w-full mb-4 px-4 flex justify-center'}>
+        <View className={'w-full flex'}>
             {label && <Text className={'text-white mb-2'}>{label}</Text>}
             <TextInput
                 onBlur={onBlur}
-                textAlignVertical="center"
                 className={
-                    'h-auto text-base text-justify border border-secondary bg-light text-dark rounded-3xl px-4 py-2'
+                    'flex justify-center items-center h-14 text-base placeholder:z-10 text-justify border-0 border-b-2 rounded-lg border-secondary bg-gray-200 text-dark pt-0 pb-0 px-3'
                 }
                 placeholder={placeholder}
+                placeholderTextColor="#708090"
                 value={value}
                 onChangeText={onChangeText}
                 multiline={multiline}
