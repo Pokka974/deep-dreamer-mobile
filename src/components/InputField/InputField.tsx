@@ -6,6 +6,7 @@ interface InputFieldProps {
     error?: string;
     placeholder: string;
     value?: string;
+    onBlur: () => void;
     onChangeText: (text: string) => void;
     multiline?: boolean;
     numberOfLines?: number;
@@ -15,17 +16,20 @@ const InputField: React.FC<InputFieldProps> = ({
     label,
     error,
     placeholder,
+    onBlur,
     value,
     onChangeText,
     multiline = false,
     numberOfLines = 1,
 }) => {
     return (
-        <View className={'w-full mb-4 px-4'}>
+        <View className={'w-full mb-4 px-4 flex justify-center'}>
             {label && <Text className={'text-white mb-2'}>{label}</Text>}
             <TextInput
+                onBlur={onBlur}
+                textAlignVertical="center"
                 className={
-                    'h-auto text-base text-justify border border-secondary bg-light text-dark rounded-xl px-4 py-2'
+                    'h-auto text-base text-justify border border-secondary bg-light text-dark rounded-3xl px-4 py-2'
                 }
                 placeholder={placeholder}
                 value={value}

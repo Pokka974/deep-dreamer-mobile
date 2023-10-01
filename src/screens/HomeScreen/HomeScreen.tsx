@@ -1,35 +1,43 @@
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import {
-    Text,
     KeyboardAvoidingView,
-    SafeAreaView,
     Platform,
     TouchableWithoutFeedback,
     Keyboard,
+    SafeAreaView,
     ScrollView,
     View,
+    Text,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
 import Button from '../../components/Button/Button';
 import InputField from '../../components/InputField/InputField';
 import chatgptAPI from '../../api/chatgptAPI';
 import TypingText from '../../components/TypingText/TypingText';
 import BlinkingCursor from '../../components/BlinkingCursor/BlinkingCursor';
 
+interface FormData {
+    dreamDescription: string;
+}
+
 const HomeScreen = ({ navigation }: any) => {
-    const [dreamDescription, setDreamDescription] = useState<string>('');
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormData>();
     const [dreamInterpretation, setDreamInterpretation] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const callChatGPT = async (prompt: string) => {
-        setDreamDescription('');
+    const callChatGPT = async (data: FormData) => {
+        const { dreamDescription } = data;
         setDreamInterpretation('');
         try {
             setLoading(true);
-            const data = await chatgptAPI.postChatGPT(prompt);
-            if (data && data.completion) {
-                console.log(data.completion);
-
-                setDreamInterpretation(data.completion);
+            const response = await chatgptAPI.postChatGPT(dreamDescription);
+            if (response && response.completion) {
+                console.log(response.completion);
+                setDreamInterpretation(response.completion);
                 setLoading(false);
             }
         } catch (error) {
@@ -64,21 +72,28 @@ const HomeScreen = ({ navigation }: any) => {
                             </View>
                         </View>
                         <View className="w-full items-center justify-center flex-1">
-                            <InputField
-                                placeholder="Describe your dream..."
-                                onChangeText={(text: string) => {
-                                    setDreamDescription(text);
-                                }}
-                                value={dreamDescription}
-                                multiline
-                                numberOfLines={20}
+                            <Controller
+                                control={control}
+                                render={({
+                                    field: { onChange, onBlur, value },
+                                }) => (
+                                    <InputField
+                                        placeholder="Describe your dream..."
+                                        onChangeText={onChange}
+                                        value={value}
+                                        onBlur={onBlur}
+                                        error={errors.dreamDescription?.message}
+                                        multiline
+                                        numberOfLines={20}
+                                    />
+                                )}
+                                name="dreamDescription"
+                                rules={{ required: 'This is required.' }}
                             />
                             <Button
                                 disabled={loading}
                                 title="Analyze my Dream"
-                                onPress={() => {
-                                    callChatGPT(dreamDescription);
-                                }}
+                                onPress={handleSubmit(callChatGPT)}
                                 style="primary"
                             />
                         </View>

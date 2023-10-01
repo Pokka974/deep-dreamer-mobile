@@ -17,23 +17,22 @@ function TypingText({ text }: any) {
 
         intervalRef.current = window.setInterval(
             () => {
-                // <--- use window.setInterval here
                 if (index.current < text.length) {
                     setDisplayedText(
                         (prevState) => prevState + text.charAt(index.current),
                     );
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // add haptic feedback
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // device vibration
                     index.current++;
                 } else {
-                    window.clearInterval(intervalRef.current!); // <--- use window.clearInterval here
+                    window.clearInterval(intervalRef.current!);
                 }
             },
-            getRandomInt(45, 100),
+            getRandomInt(20, 60),
         ); // speed of typing
 
         return () => {
             window.clearInterval(intervalRef.current!);
-        }; // <--- use window.clearInterval here
+        };
     }, [text]);
 
     return <Text className="text-white text-base">{displayedText}</Text>;

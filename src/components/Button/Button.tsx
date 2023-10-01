@@ -5,10 +5,10 @@ interface IButton {
     title: string;
     onPress: () => void;
     style: 'primary' | 'secondary';
-    disabled: boolean;
+    disabled?: boolean;
 }
 
-const Button = ({ title, onPress, style, disabled }: IButton) => {
+const Button = ({ title, onPress, style, disabled = false }: IButton) => {
     const customColor = disabled
         ? 'bg-secondary opacity-50'
         : style === 'primary'
