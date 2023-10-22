@@ -15,7 +15,7 @@ module.exports = {
                 light: '#F4F5F7',
             },
             fontFamily: {
-                custom: ['Roboto', 'sans-serif'],
+                custom: ['Quick-Kiss', 'sans-serif'],
             },
         },
     },
