@@ -5,15 +5,25 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import InputField from '../../components/InputField/InputField';
 import Button from '../../components/Button/Button';
 import { LinearGradient } from 'expo-linear-gradient';
 import useFloatingAnimation from '../../hooks/useFloatingAnimation';
 import { Animated } from 'react-native';
+import { NavigationProp } from '@react-navigation/native';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+
+interface RegisterProps {
+    navigation: NavigationProp<any, any>;
+}
 
 const Register = ({ navigation }: any) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState<boolean>(false);
+
     const floatingStyle = useFloatingAnimation(1500);
 
     const {
@@ -27,8 +37,29 @@ const Register = ({ navigation }: any) => {
             confirmpassword: '',
         },
     });
+    const auth = getAuth();
 
-    const onSubmit = (data: any) => console.log(data);
+    const onSubmit = async (data: any) => {
+        if (data.password !== data.confirmpassword)
+            return alert('passwords do not match');
+
+        setLoading(true);
+
+        try {
+            const response = await createUserWithEmailAndPassword(
+                auth,
+                data.email,
+                data.password,
+            );
+            console.log(response);
+            alert('Check your email!');
+        } catch (error: any) {
+            console.log(error);
+            alert('Something went wrong !' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <LinearGradient colors={['#61cec2', '#29405c']} className="h-full">
             <KeyboardAvoidingView
@@ -62,6 +93,7 @@ const Register = ({ navigation }: any) => {
                                 <InputField
                                     label="Email"
                                     placeholder="Email"
+                                    type="emailAddress"
                                     onChangeText={onChange}
                                     value={value}
                                     onBlur={onBlur}
@@ -80,6 +112,7 @@ const Register = ({ navigation }: any) => {
                             }) => (
                                 <InputField
                                     label="Password"
+                                    type="password"
                                     placeholder="Password"
                                     onChangeText={onChange}
                                     value={value}
@@ -102,6 +135,7 @@ const Register = ({ navigation }: any) => {
                             }) => (
                                 <InputField
                                     label="Confirm Password"
+                                    type="password"
                                     placeholder="Confirm password"
                                     onChangeText={onChange}
                                     value={value}

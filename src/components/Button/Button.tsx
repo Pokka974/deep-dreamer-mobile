@@ -12,7 +12,7 @@ const Button = ({ title, onPress, style, disabled = false }: IButton) => {
     const customColor = disabled
         ? 'bg-secondary opacity-50'
         : style === 'primary'
-        ? 'bg-primary'
+        ? 'bg-[#ff6290]'
         : 'bg-highlight';
 
     return (

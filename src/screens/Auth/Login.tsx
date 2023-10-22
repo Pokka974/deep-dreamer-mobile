@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ErrorInfo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
     ScrollView,
@@ -13,9 +13,18 @@ import InputField from '../../components/InputField/InputField';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Animated } from 'react-native';
 import useFloatingAnimation from '../../hooks/useFloatingAnimation';
-
+import { NavigationProp } from '@react-navigation/native';
+import { FIREBASE_AUTH } from '../../../firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+interface LoginProps {
+    navigation: NavigationProp<any, any>;
+}
 //TODO: type navigation
-const Login = ({ navigation }: any) => {
+const Login = ({ navigation }: LoginProps) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState<boolean>(false);
+
     const floatingStyle = useFloatingAnimation(1500);
 
     const {
@@ -29,7 +38,24 @@ const Login = ({ navigation }: any) => {
         },
     });
 
-    const onSubmit = (data: any) => console.log(data);
+    const auth = FIREBASE_AUTH;
+    const onSubmit = async (data: any) => {
+        setLoading(true);
+
+        try {
+            const response = await signInWithEmailAndPassword(
+                auth,
+                data.email,
+                data.password,
+            );
+            console.log(response);
+        } catch (error: any) {
+            console.log(error);
+            alert('Something went wrong !' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <LinearGradient colors={['#61cec2', '#29405c']} className="h-full">
@@ -63,6 +89,7 @@ const Login = ({ navigation }: any) => {
                             }) => (
                                 <InputField
                                     label="Email"
+                                    type="emailAddress"
                                     placeholder="Email"
                                     onChangeText={onChange}
                                     value={value}
@@ -82,6 +109,7 @@ const Login = ({ navigation }: any) => {
                             }) => (
                                 <InputField
                                     label="Password"
+                                    type="password"
                                     placeholder="Password"
                                     onChangeText={onChange}
                                     value={value}
