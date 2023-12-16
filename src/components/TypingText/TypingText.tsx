@@ -27,7 +27,7 @@ function TypingText({ text }: any) {
                     window.clearInterval(intervalRef.current!);
                 }
             },
-            getRandomInt(20, 60),
+            getRandomInt(10, 40),
         ); // speed of typing
 
         return () => {
@@ -35,7 +35,7 @@ function TypingText({ text }: any) {
         };
     }, [text]);
 
-    return <Text className="text-white text-base">{displayedText}</Text>;
+    return <Text className="text-white text-lg">{displayedText}</Text>;
 }
 
 export default TypingText;

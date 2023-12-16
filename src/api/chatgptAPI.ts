@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 const postChatGPT = async (userInput: string) => {
     try {
         const response = await fetch(
-            `${Constants.manifest?.extra?.apiUrl}/chatgpt`,
+            `${Constants.expoConfig?.extra?.apiUrl}/chatgpt`,
             {
                 method: 'POST',
                 headers: {

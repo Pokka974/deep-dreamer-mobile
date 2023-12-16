@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
     KeyboardAvoidingView,
@@ -8,19 +8,21 @@ import {
     SafeAreaView,
     ScrollView,
     View,
-    Text,
+    TouchableOpacity,
 } from 'react-native';
-import Button from '../../components/Button/Button';
 import InputField from '../../components/InputField/InputField';
 import chatgptAPI from '../../api/chatgptAPI';
 import TypingText from '../../components/TypingText/TypingText';
 import BlinkingCursor from '../../components/BlinkingCursor/BlinkingCursor';
-
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 interface FormData {
     dreamDescription: string;
 }
+import { UserContext } from '../../../App';
 
 const HomeScreen = ({ navigation }: any) => {
+    const user = useContext(UserContext);
     const {
         control,
         handleSubmit,
@@ -46,23 +48,22 @@ const HomeScreen = ({ navigation }: any) => {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            className="flex-1"
-        >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <SafeAreaView className="flex-1 bg-dark">
-                    <ScrollView
-                        contentContainerStyle={{
-                            flexGrow: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <View className="w-full items-center justify-start px-4 pt-6">
-                            <Text className="text-light text-2xl">
-                                Welcome dreamer! Ready to explore your dreams?
-                            </Text>
+        <LinearGradient colors={['#61cec2', '#29405c']} className="h-full">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="flex-1"
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <SafeAreaView className="flex-1 p-4">
+                        <ScrollView
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{
+                                flexGrow: 1,
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                            }}
+                        >
                             <View className="flex-row self-start px-2 pt-4">
                                 <TypingText
                                     className="text-justify"
@@ -70,8 +71,8 @@ const HomeScreen = ({ navigation }: any) => {
                                 />
                                 {loading && <BlinkingCursor />}
                             </View>
-                        </View>
-                        <View className="w-full items-center justify-center flex-1">
+                        </ScrollView>
+                        <View className="flex-row items-center justify-between gap-1 mx-4 absolute bottom-6">
                             <Controller
                                 control={control}
                                 render={({
@@ -81,26 +82,31 @@ const HomeScreen = ({ navigation }: any) => {
                                         placeholder="Describe your dream..."
                                         onChangeText={onChange}
                                         value={value}
+                                        width={'w-5/6'}
                                         onBlur={onBlur}
-                                        error={errors.dreamDescription?.message}
                                         multiline
-                                        numberOfLines={20}
                                     />
                                 )}
                                 name="dreamDescription"
-                                rules={{ required: 'This is required.' }}
+                                rules={{
+                                    required: 'This is required.',
+                                }}
                             />
-                            <Button
-                                disabled={loading}
-                                title="Analyze my Dream"
+                            <TouchableOpacity
+                                className="w-1/6 flex justify-center items-center mr-2 mb-2"
                                 onPress={handleSubmit(callChatGPT)}
-                                style="primary"
-                            />
+                            >
+                                <Ionicons
+                                    name="arrow-up-circle-sharp"
+                                    size={45}
+                                    color="#ff6290"
+                                />
+                            </TouchableOpacity>
                         </View>
-                    </ScrollView>
-                </SafeAreaView>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                    </SafeAreaView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </LinearGradient>
     );
 };
 
