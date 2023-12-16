@@ -20,7 +20,6 @@ interface FormData {
     dreamDescription: string;
 }
 import { UserContext } from '../../../App';
-import { Text } from 'react-native';
 
 const HomeScreen = ({ navigation }: any) => {
     const user = useContext(UserContext);
@@ -86,7 +85,6 @@ const HomeScreen = ({ navigation }: any) => {
                                         width={'w-5/6'}
                                         onBlur={onBlur}
                                         multiline
-                                        height={11}
                                     />
                                 )}
                                 name="dreamDescription"
@@ -94,7 +92,6 @@ const HomeScreen = ({ navigation }: any) => {
                                     required: 'This is required.',
                                 }}
                             />
-
                             <TouchableOpacity
                                 className="w-1/6 flex justify-center items-center mr-2 mb-2"
                                 onPress={handleSubmit(callChatGPT)}

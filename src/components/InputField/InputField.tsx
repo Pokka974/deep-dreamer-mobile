@@ -19,7 +19,7 @@ const InputField: React.FC<InputFieldProps> = ({
     label,
     type,
     error,
-    height = 11,
+    height = 14,
     width,
     placeholder,
     onBlur,
@@ -40,7 +40,7 @@ const InputField: React.FC<InputFieldProps> = ({
                 textAlignVertical="top"
                 textContentType={type}
                 className={`flex justify-center items-center h-${height} text-base text-justify border-0 rounded-lg border-secondary bg-gray-200 text-dark ${
-                    multiline ? 'pt-2' : 'pt-0'
+                    multiline ? 'pt-3' : 'pt-0'
                 } pb-0 px-3`}
                 placeholder={placeholder}
                 placeholderTextColor="#708090"

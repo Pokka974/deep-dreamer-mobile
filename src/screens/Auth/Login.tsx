@@ -15,7 +15,11 @@ import { Animated } from 'react-native';
 import useFloatingAnimation from '../../hooks/useFloatingAnimation';
 import { NavigationProp } from '@react-navigation/native';
 import { FIREBASE_AUTH } from '../../../firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+} from 'firebase/auth';
 interface LoginProps {
     navigation: NavigationProp<any, any>;
 }
@@ -54,6 +58,32 @@ const Login = ({ navigation }: LoginProps) => {
             alert('Something went wrong !' + error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loginWithGoogle = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const response = await signInWithPopup(auth, provider);
+            console.log(response);
+
+            if (response) {
+                const credential =
+                    GoogleAuthProvider.credentialFromResult(response);
+                const token = credential?.accessToken;
+                const user = response.user;
+
+                console.log(user);
+                console.log(token);
+            }
+        } catch (error: any) {
+            console.error(error);
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
         }
     };
 
@@ -142,6 +172,11 @@ const Login = ({ navigation }: LoginProps) => {
                     >
                         Register
                     </Text>
+                    <Button
+                        title="Google"
+                        onPress={loginWithGoogle}
+                        disabled={false}
+                    />
                 </ScrollView>
             </KeyboardAvoidingView>
         </LinearGradient>

@@ -51,7 +51,6 @@ const Register = ({ navigation }: any) => {
                 data.email,
                 data.password,
             );
-            console.log(response);
             alert('Check your email!');
         } catch (error: any) {
             console.log(error);
