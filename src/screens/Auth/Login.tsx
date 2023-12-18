@@ -88,7 +88,10 @@ const Login = ({ navigation }: LoginProps) => {
     };
 
     return (
-        <LinearGradient colors={['#61cec2', '#29405c']} className="h-full">
+        <LinearGradient
+            colors={['#4b6384', '#7db4b4', '#f2e5e5']}
+            className="h-full"
+        >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}

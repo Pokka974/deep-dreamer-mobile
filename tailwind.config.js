@@ -16,6 +16,11 @@ module.exports = {
             },
             fontFamily: {
                 custom: ['Quick-Kiss', 'sans-serif'],
+                quicksand: ['Quicksand', 'sans-serif'],
+                quicksandBold: ['QuicksandBold', 'sans-serif'],
+                quicksandMedium: ['QuicksandMedium', 'sans-serif'],
+                quicksandSemiBold: ['QuicksandSemiBold', 'sans-serif'],
+                quicksandLight: ['QuicksandLight', 'sans-serif'],
             },
         },
     },

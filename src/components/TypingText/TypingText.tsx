@@ -35,7 +35,11 @@ function TypingText({ text }: any) {
         };
     }, [text]);
 
-    return <Text className="text-white text-lg">{displayedText}</Text>;
+    return (
+        <Text className="text-black fond-quicksandLight text-lg">
+            {displayedText}
+        </Text>
+    );
 }
 
 export default TypingText;
