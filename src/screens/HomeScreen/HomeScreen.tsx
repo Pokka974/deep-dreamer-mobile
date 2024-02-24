@@ -1,32 +1,28 @@
-import React, { useContext, useRef, useState } from 'react';
-import { useForm, Controller, set } from 'react-hook-form';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
+    Keyboard,
     KeyboardAvoidingView,
     Platform,
-    TouchableWithoutFeedback,
-    Keyboard,
     SafeAreaView,
     ScrollView,
-    View,
-    TouchableOpacity,
     Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
-import InputField from '../../components/InputField/InputField';
 import chatgptAPI from '../../api/chatgptAPI';
 import dalleEAPI from '../../api/dalleEAPI';
-import TypingText from '../../components/TypingText/TypingText';
 import BlinkingCursor from '../../components/BlinkingCursor/BlinkingCursor';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import InputField from '../../components/InputField/InputField';
+import TypingText from '../../components/TypingText/TypingText';
+import { getToken } from '../../utils/manageToken';
 interface FormData {
     dreamDescription: string;
 }
-import { UserContext } from '../../../App';
-import { addDoc, collection } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../firebaseConfig';
 
 const HomeScreen = ({ navigation }: any) => {
-    const user: any = useContext(UserContext);
     const {
         reset,
         setValue,
@@ -35,11 +31,11 @@ const HomeScreen = ({ navigation }: any) => {
         formState: { errors },
     } = useForm<FormData>();
     const [dreamDescription, setDreamDescription] = useState<string>('');
+    const [dreamId, setDreamId] = useState<number>();
     const [dreamInterpretation, setDreamInterpretation] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [dreamSaving, setDreamSaving] = useState<boolean>(false);
+    const [loadingDallE, setLoadingDalleE] = useState<boolean>(false);
     const scrollViewRef = useRef<ScrollView>(null);
-    const scrollViewRef2 = useRef<ScrollView>(null);
 
     const callChatGPT = async (data: FormData) => {
         const { dreamDescription } = data;
@@ -47,9 +43,16 @@ const HomeScreen = ({ navigation }: any) => {
         setDreamInterpretation('');
         try {
             setLoading(true);
-            const response = await chatgptAPI.postChatGPT(dreamDescription);
-            if (response && response.completion) {
-                setDreamInterpretation(response.completion);
+            const token = await fetchToken();
+
+            const response = await chatgptAPI.postChatGPT(
+                dreamDescription,
+                token,
+            );
+
+            if (response && response.interpretation) {
+                setDreamInterpretation(response.interpretation);
+                setDreamId(response.id);
                 setLoading(false);
             }
         } catch (error) {
@@ -57,11 +60,28 @@ const HomeScreen = ({ navigation }: any) => {
         }
     };
 
-    const generateImage = async (dreamDescription: string) => {
+    const generateImage = async (dreamInterpretation: string) => {
+        setLoadingDalleE(true);
         try {
-            const response = await dalleEAPI.generateDallE(dreamDescription);
+            const dreamSummary = dreamInterpretation.split(':')[0];
+            const dream =
+                dreamSummary && dreamSummary.length
+                    ? dreamSummary
+                    : dreamInterpretation;
+            const token = await fetchToken();
+
+            if (!dreamId) {
+                throw new Error('No related Dream ID');
+            }
+            const response = await dalleEAPI.generateDallE(
+                dream,
+                dreamId!,
+                token,
+            );
 
             if (response && response.url) {
+                console.log(response);
+                setLoadingDalleE(false);
                 return response.url;
             }
         } catch (error) {
@@ -69,80 +89,54 @@ const HomeScreen = ({ navigation }: any) => {
         }
     };
 
-    const saveTheDream = async () => {
-        try {
-            setDreamSaving(true);
-            const docRef = await addDoc(collection(FIRESTORE_DB, 'dreams'), {
-                createdAt: new Date(),
-                dreamImageURL: await generateImage(dreamDescription),
-                userId: user?.uid,
-                dreamDescription,
-                dreamInterpretation,
-            });
+    const fetchToken = async () => {
+        const token = await getToken();
 
-            if (docRef) {
-                setDreamSaving(false);
-            }
-            console.log('Document written with ID: ', docRef.id);
-        } catch (error) {
-            console.error('Error adding document: ', error);
+        if (!token) {
+            setDreamInterpretation('Impossible to process this dream :(');
+            setLoading(false);
+            throw new Error('Impossible to get token');
         }
+
+        return token;
     };
 
     const restart = () => {
         reset();
         setValue('dreamDescription', '');
-        setDreamSaving(false);
+        setLoading(false);
+        setLoadingDalleE(false);
         setDreamDescription('');
         setDreamInterpretation('');
     };
 
     return (
-        <LinearGradient
-            colors={['#4b6384', '#7db4b4', '#f2e5e5']}
-            className="h-full"
-        >
+        <SafeAreaView className="h-full  bg-dark">
             <TouchableWithoutFeedback
                 className="flex-1"
                 onPress={Keyboard.dismiss}
             >
                 <KeyboardAvoidingView
-                    keyboardVerticalOffset={80}
                     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                    className="flex-1 w-full"
+                    className="flex-1 w-full pt-5"
                 >
                     <View
-                        className={`flex-1 p-4 ${
+                        className={`flex-1 px-3 pt-12 ${
                             dreamInterpretation &&
                             'bg-stone-200 m-5 p-3 rounded-lg  text-black min-h-[200px]'
                         }`}
                     >
                         {dreamInterpretation ? (
                             <>
-                                {/* <ScrollView
-                                    className="flex items-center my-2"
-                                    keyboardShouldPersistTaps="handled"
-                                    ref={scrollViewRef}
-                                    onContentSizeChange={() =>
-                                        scrollViewRef.current?.scrollToEnd({
-                                            animated: true,
-                                        })
-                                    }
-                                    showsVerticalScrollIndicator={false}
-                                >
-                                    <Text className="text-justify italic">
-                                        {dreamDescription}
-                                    </Text>
-                                </ScrollView> */}
                                 <Text className="flex flex-row items-center h-10 font-quicksandBold text-lg">
                                     What it means:
                                 </Text>
                                 <ScrollView
                                     className="flex-4 text-start my-2"
                                     keyboardShouldPersistTaps="handled"
-                                    ref={scrollViewRef2}
+                                    ref={scrollViewRef}
                                     onContentSizeChange={() =>
-                                        scrollViewRef2.current?.scrollToEnd({
+                                        scrollViewRef.current?.scrollToEnd({
                                             animated: true,
                                         })
                                     }
@@ -163,10 +157,12 @@ const HomeScreen = ({ navigation }: any) => {
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        disabled={dreamSaving}
-                                        onPress={() => saveTheDream()}
+                                        disabled={loadingDallE}
+                                        onPress={() =>
+                                            generateImage(dreamInterpretation)
+                                        }
                                         className={`h-11 border px-3 py-3 border-gray-700 ${
-                                            dreamSaving
+                                            loadingDallE
                                                 ? ' bg-gray-500'
                                                 : 'bg-[#4b6384]'
                                         }  rounded-md`}
@@ -181,7 +177,7 @@ const HomeScreen = ({ navigation }: any) => {
                             loading && <BlinkingCursor />
                         )}
                     </View>
-                    <View className="flex flex-row items-center justify-between p-5">
+                    <View className="flex flex-row items-center justify-between px-3">
                         <Controller
                             control={control}
                             render={({
@@ -203,20 +199,20 @@ const HomeScreen = ({ navigation }: any) => {
                             }}
                         />
                         <TouchableOpacity
-                            className="flex justify-center items-center "
+                            className="flex justify-center items-center"
                             onPress={handleSubmit(callChatGPT)}
-                            disabled={dreamSaving}
+                            disabled={loading}
                         >
                             <Ionicons
                                 name="arrow-up-circle-sharp"
                                 size={50}
-                                color="#4b6384"
+                                color="#F4F5F7"
                             />
                         </TouchableOpacity>
                     </View>
                 </KeyboardAvoidingView>
             </TouchableWithoutFeedback>
-        </LinearGradient>
+        </SafeAreaView>
     );
 };
 

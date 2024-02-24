@@ -12,7 +12,7 @@ module.exports = {
                 dark: '#00083e',
                 secondary: '#3F5E9A',
                 accent: '#88B1E1',
-                light: '#F4F5F7',
+                highlight: '#F4F5F7',
             },
             fontFamily: {
                 custom: ['Quick-Kiss', 'sans-serif'],

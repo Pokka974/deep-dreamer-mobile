@@ -1,6 +1,10 @@
 import Constants from 'expo-constants';
 
-const generateDallE = async (dreamDescription: string) => {
+const generateDallE = async (
+    dreamDescription: string,
+    dreamId: number,
+    token: string,
+) => {
     try {
         const response = await fetch(
             `${Constants.expoConfig?.extra?.apiUrl}/dalle`,
@@ -8,8 +12,9 @@ const generateDallE = async (dreamDescription: string) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ dreamDescription }),
+                body: JSON.stringify({ dreamDescription, dreamId }),
             },
         );
 
@@ -17,9 +22,10 @@ const generateDallE = async (dreamDescription: string) => {
             throw new Error('Network response was not ok');
         }
 
-        return response.json();
+        const responseData = await response.json();
+        return responseData;
     } catch (error) {
-        console.log('Fetch Error:', error);
+        console.error('Fetch Error:', error);
         throw error;
     }
 };

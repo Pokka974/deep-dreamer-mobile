@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const postChatGPT = async (userInput: string) => {
+const postChatGPT = async (prompt: string, token: string) => {
     try {
         const response = await fetch(
             `${Constants.expoConfig?.extra?.apiUrl}/chatgpt`,
@@ -8,8 +8,9 @@ const postChatGPT = async (userInput: string) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ userInput }),
+                body: JSON.stringify({ prompt }),
             },
         );
 
@@ -17,9 +18,11 @@ const postChatGPT = async (userInput: string) => {
             throw new Error('Network response was not ok');
         }
 
-        return response.json();
+        const responseData = await response.json();
+
+        return responseData;
     } catch (error) {
-        console.log('Fetch Error:', error);
+        console.error('Fetch Error:', error);
         throw error;
     }
 };

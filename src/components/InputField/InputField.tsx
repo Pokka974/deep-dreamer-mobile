@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, TextInput, Text, Platform } from 'react-native';
 
 interface InputFieldProps {
@@ -29,6 +29,13 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => {
     const [inputHeight, setInputHeight] = useState(50);
     const [isFocused, setIsFocused] = useState(false);
+    // TODO: try to improve performance for the height rendering
+    const inputStyle = useMemo(
+        () => ({
+            height: Math.max(50, inputHeight),
+        }),
+        [inputHeight],
+    );
 
     const handleContentSizeChange = (event: any) => {
         const { height } = event.nativeEvent.contentSize;
@@ -40,6 +47,7 @@ const InputField: React.FC<InputFieldProps> = ({
         <View className={`w-full flex`}>
             {label && <Text className={'text-white text-lg'}>{label}:</Text>}
             <TextInput
+                style={inputStyle}
                 onBlur={onBlur}
                 secureTextEntry={type === 'password'}
                 keyboardType={
@@ -48,12 +56,9 @@ const InputField: React.FC<InputFieldProps> = ({
                 textAlignVertical="center"
                 onFocus={() => setIsFocused(true)}
                 textContentType={type}
-                className={`flex justify-center items-center font-quicksand h-[${Math.max(
-                    50,
-                    inputHeight,
-                )}px] text-base rounded-xl border bg-stone-200 text-dark pl-3 ${
-                    multiline ? 'pt-3' : 'pt-0'
-                } pb-0 px-3 ${Platform.OS === 'ios' ? 'py-3' : 'py-0'}}`}
+                className={`flex justify-center items-center font-quicksand text-base rounded-xl border bg-stone-200 text-dark pl-3 pt-3 pb-0  ${
+                    Platform.OS === 'ios' ? 'py-3' : 'py-0'
+                }}`}
                 placeholder={placeholder}
                 placeholderTextColor="#708090"
                 value={value}

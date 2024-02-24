@@ -1,34 +1,27 @@
-import React, { ErrorInfo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { NavigationProp } from '@react-navigation/native';
+import React, { useContext, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
+    Animated,
+    KeyboardAvoidingView,
+    Platform,
     ScrollView,
     Text,
     View,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
 } from 'react-native';
+import { login } from '../../api/authAPI';
 import Button from '../../components/Button/Button';
 import InputField from '../../components/InputField/InputField';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Animated } from 'react-native';
 import useFloatingAnimation from '../../hooks/useFloatingAnimation';
-import { NavigationProp } from '@react-navigation/native';
-import { FIREBASE_AUTH } from '../../../firebaseConfig';
-import {
-    signInWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
-} from 'firebase/auth';
+import authContext from '../../utils/authContext';
+import { saveToken } from '../../utils/manageToken';
 interface LoginProps {
     navigation: NavigationProp<any, any>;
 }
 //TODO: type navigation
 const Login = ({ navigation }: LoginProps) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState<boolean>(false);
-
+    const { setAuthenticated } = useContext(authContext);
     const floatingStyle = useFloatingAnimation(1500);
 
     const {
@@ -42,56 +35,28 @@ const Login = ({ navigation }: LoginProps) => {
         },
     });
 
-    const auth = FIREBASE_AUTH;
     const onSubmit = async (data: any) => {
         setLoading(true);
 
         try {
-            const response = await signInWithEmailAndPassword(
-                auth,
-                data.email,
-                data.password,
-            );
-            console.log(response);
+            const response = await login(data.email, data.password);
+
+            if (!response) {
+                throw new Error();
+            }
+
+            saveToken(response.token);
+            setAuthenticated(true);
         } catch (error: any) {
-            console.log(error);
+            console.error(error);
             alert('Something went wrong !' + error.message);
         } finally {
             setLoading(false);
         }
     };
 
-    const loginWithGoogle = async () => {
-        try {
-            const provider = new GoogleAuthProvider();
-            const response = await signInWithPopup(auth, provider);
-            console.log(response);
-
-            if (response) {
-                const credential =
-                    GoogleAuthProvider.credentialFromResult(response);
-                const token = credential?.accessToken;
-                const user = response.user;
-
-                console.log(user);
-                console.log(token);
-            }
-        } catch (error: any) {
-            console.error(error);
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // The email of the user's account used.
-            const email = error.customData.email;
-            // The AuthCredential type that was used.
-            const credential = GoogleAuthProvider.credentialFromError(error);
-        }
-    };
-
     return (
-        <LinearGradient
-            colors={['#4b6384', '#7db4b4', '#f2e5e5']}
-            className="h-full"
-        >
+        <View className="h-full bg-dark">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
@@ -175,14 +140,9 @@ const Login = ({ navigation }: LoginProps) => {
                     >
                         Register
                     </Text>
-                    <Button
-                        title="Google"
-                        onPress={loginWithGoogle}
-                        disabled={false}
-                    />
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </View>
     );
 };
 

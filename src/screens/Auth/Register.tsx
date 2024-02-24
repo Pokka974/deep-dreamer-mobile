@@ -1,28 +1,28 @@
+import { NavigationProp } from '@react-navigation/native';
+import React, { useContext, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
+    Animated,
+    KeyboardAvoidingView,
+    Platform,
     ScrollView,
     Text,
     View,
-    KeyboardAvoidingView,
-    Platform,
 } from 'react-native';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import InputField from '../../components/InputField/InputField';
+import { register } from '../../api/authAPI';
 import Button from '../../components/Button/Button';
-import { LinearGradient } from 'expo-linear-gradient';
+import InputField from '../../components/InputField/InputField';
 import useFloatingAnimation from '../../hooks/useFloatingAnimation';
-import { Animated } from 'react-native';
-import { NavigationProp } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import authContext from '../../utils/authContext';
+import { saveToken } from '../../utils/manageToken';
 
 interface RegisterProps {
     navigation: NavigationProp<any, any>;
 }
 
-const Register = ({ navigation }: any) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const Register = ({ navigation }: RegisterProps) => {
     const [loading, setLoading] = useState<boolean>(false);
+    const { setAuthenticated } = useContext(authContext);
 
     const floatingStyle = useFloatingAnimation(1500);
 
@@ -37,7 +37,6 @@ const Register = ({ navigation }: any) => {
             confirmpassword: '',
         },
     });
-    const auth = getAuth();
 
     const onSubmit = async (data: any) => {
         if (data.password !== data.confirmpassword)
@@ -46,24 +45,22 @@ const Register = ({ navigation }: any) => {
         setLoading(true);
 
         try {
-            const response = await createUserWithEmailAndPassword(
-                auth,
-                data.email,
-                data.password,
-            );
-            alert('Check your email!');
+            const response = await register(data.email, data.password);
+
+            if (!response) {
+                throw new Error();
+            }
+            saveToken(response.token);
+            setAuthenticated(true);
         } catch (error: any) {
-            console.log(error);
+            console.error(error);
             alert('Something went wrong !' + error.message);
         } finally {
             setLoading(false);
         }
     };
     return (
-        <LinearGradient
-            colors={['#4b6384', '#7db4b4', '#f2e5e5']}
-            className="h-full"
-        >
+        <View className="h-full bg-dark">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
@@ -166,7 +163,7 @@ const Register = ({ navigation }: any) => {
                     </Text>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </View>
     );
 };
 
